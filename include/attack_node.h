@@ -20,15 +20,6 @@ enum class AttackCategory {
     MIRAI
 };
 
-enum class WebAttackType {
-    WEB_SQL_INJECTION,
-    WEB_COMMAND_INJECTION,
-    WEB_BACKDOOR_MALWARE,
-    WEB_UPLOADING_ATTACK,
-    WEB_XSS,
-    WEB_BROWSER_HIJACKING
-};
-
 enum class AttackType {
     // DDoS
     DDOS_ACK_FRAGMENTATION,
